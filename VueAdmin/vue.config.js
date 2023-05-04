@@ -11,7 +11,8 @@ const name = defaultSettings.title || 'vue Admin Template' // 页面标题
 const port = process.env.port || process.env.npm_config_port || 9528 // 开发端口
 
 module.exports = {
-  publicPath: '/',
+  // 项目名，与Nginx中location的配置项一致
+  publicPath: '/RBAC',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
