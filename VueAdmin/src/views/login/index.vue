@@ -1,9 +1,9 @@
 <template>
-  <div class="login-container">
+  <el-row class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">Login</h3>
       </div>
 
       <el-form-item prop="username">
@@ -13,7 +13,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="用户名"
+          placeholder="请输入用户名"
           name="username"
           type="text"
           tabindex="1"
@@ -30,7 +30,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="密码"
+          placeholder="请输入密码"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -41,33 +41,68 @@
         </span>
       </el-form-item>
 
+      <el-row>
+        <el-col :span="16">
+          <el-form-item prop="verifyCodeInput">
+            <span class="svg-container">
+              <svg-icon icon-class="example" />
+            </span>
+            <el-input v-model="loginForm.verifyCodeInput" placeholder="请输入验证码" />
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="8">
+          <div class="verifyCodeImageBox">
+            <div @click="refreshVerifyCode">
+              <s-identify :verify-code="verifyCode" />
+            </div>
+          </div>
+        </el-col>
+      </el-row>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
-      <div class="tips">
-        <span style="margin-right:20px;">username: root</span>
-        <span> password: 123456</span>
-      </div>
-
     </el-form>
-  </div>
+  </el-row>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
+import SIdentify from '@/components/VerifyCode/index.vue'
 
 export default {
   name: 'Login',
+  components: {
+    SIdentify
+  },
   data() {
+    // 用户名验证规则
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
+        // 用户名验证失败，重新生成验证码
+        this.verifyCode = ''
+        this.makeVerifyCode(this.verifyCodes, 4)
+        history.pushState(null, null, document.URL)
+
         callback(new Error('请输入正确的用户名'))
       } else {
         callback()
       }
     }
+    // 密码验证规则
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('密码不能少于6位数字'))
+        callback(new Error('密码不能少于6位'))
+      } else {
+        callback()
+      }
+    }
+    // 输入的验证码验证规则
+    const validateVerifyCodeInput = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入验证码'))
+      } else if (value !== this.verifyCode) {
+        callback(new Error('验证码错误'))
       } else {
         callback()
       }
@@ -75,12 +110,19 @@ export default {
     return {
       loginForm: {
         username: 'root',
-        password: '123456'
+        password: '123456',
+        // 输入的验证码
+        verifyCodeInput: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        verifyCodeInput: [{ required: true, trigger: 'blur', validator: validateVerifyCodeInput }]
       },
+      // 验证码字符集
+      verifyCodes: '1234567890abcdefghijklmnopqrstuvwxyz',
+      // 生成的验证码
+      verifyCode: '',
       loading: false,
       passwordType: 'password',
       redirect: undefined
@@ -94,7 +136,13 @@ export default {
       immediate: true
     }
   },
+  mounted() {
+    this.loginForm.verifyCode = ''
+    this.makeVerifyCode(this.verifyCodes, 4)
+    history.pushState(null, null, document.URL)
+  },
   methods: {
+    // 显示密码
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -105,29 +153,56 @@ export default {
         this.$refs.password.focus()
       })
     },
+    // 登录
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
+        // 对表单进行验证
         if (valid) {
           this.loading = true
+          // 发送登录请求
           this.$store.dispatch('user/login', this.loginForm).then(() => {
+            // 登录成功
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch(() => {
+            // 登录失败，重新生成验证码
+            this.verifyCode = ''
+            this.makeVerifyCode(this.verifyCodes, 4)
+            history.pushState(null, null, document.URL)
+
             this.loading = false
           })
         } else {
-          console.log('提交错误')
+          // 表单验证失败，重新生成验证码
+          this.verifyCode = ''
+          this.makeVerifyCode(this.verifyCodes, 4)
+          history.pushState(null, null, document.URL)
+
           return false
         }
       })
+    },
+    // 生成随机数
+    randomNum(min, max) {
+      return Math.floor(Math.random() * (max - min) + min)
+    },
+    // 切换验证码
+    refreshVerifyCode() {
+      this.verifyCode = ''
+      this.makeVerifyCode(this.verifyCodes, 4)
+    },
+    // 生成验证码
+    makeVerifyCode(o, l) {
+      for (let i = 0; i < l; i++) {
+        this.verifyCode += this.verifyCodes[
+          this.randomNum(0, this.verifyCodes.length)]
+      }
     }
   }
 }
 </script>
 
 <style lang="scss">
-/* 修复input 背景不协调 和光标变色 */
-
 $bg:#283443;
 $light_gray:#fff;
 $cursor: #fff;
@@ -138,7 +213,6 @@ $cursor: #fff;
   }
 }
 
-/* reset element-ui css */
 .login-container {
   .el-input {
     display: inline-block;
@@ -191,18 +265,11 @@ $light_gray:#eee;
     overflow: hidden;
   }
 
-  .tips {
-    font-size: 14px;
-    color: #fff;
-    margin-bottom: 10px;
-
-    span {
-      &:first-of-type {
-        margin-right: 16px;
-      }
-    }
+  .verifyCodeImageBox {
+      float: left;
+      padding-left: 10px;
+      justify-content: space-between;
   }
-
   .svg-container {
     padding: 6px 5px 6px 15px;
     color: $dark_gray;
