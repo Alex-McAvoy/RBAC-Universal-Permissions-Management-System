@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: system-service-8001
+  profiles:
+    active: dev
+
+# localhost:8001/actuator/info
+info:
+  module.name: "RBAC 通用权限管理"
+  module.description: "使用 Spring Cloud 开发的 RBAC 通用权限管理微服务"
+  module.serviceName: ${spring.application.name}
+  module.port: ${server.port}
+  module.author: "Alex_McAvoy"
+  build.artifactId: @project.artifactId@
+  build.version: @project.version@
