@@ -154,6 +154,7 @@
 
 <script>
 import sysMenuApi from '@/api/system/SysMenu.js'
+import icons from '@/icons/el-icons.js'
 
 const menuDefaultForm = { // 添加菜单结点表单初始值
   id: '',
@@ -180,26 +181,7 @@ export default {
       type2Disabled: false, // 菜单项类型是否可为按钮
       dialogVisible: false, // 弹出层模态框是否显示
       menuForm: menuDefaultForm, // 添加菜单结点表单
-      // 图标列表
-      iconList: [
-        { class: 'el-icon-s-tools' },
-        { class: 'el-icon-s-custom' },
-        { class: 'el-icon-setting' },
-        { class: 'el-icon-user-solid' },
-        { class: 'el-icon-s-help' },
-        { class: 'el-icon-phone' },
-        { class: 'el-icon-s-unfold' },
-        { class: 'el-icon-s-operation' },
-        { class: 'el-icon-more-outline' },
-        { class: 'el-icon-s-check' },
-        { class: 'el-icon-tickets' },
-        { class: 'el-icon-s-goods' },
-        { class: 'el-icon-document-remove' },
-        { class: 'el-icon-warning' },
-        { class: 'el-icon-warning-outline' },
-        { class: 'el-icon-question' },
-        { class: 'el-icon-info' }
-      ]
+      iconList: icons // 图标列表
     }
   },
   // 生命周期函数，内存准备完毕，页面尚未渲染
