@@ -15,6 +15,6 @@
 - SecurityModule：Spring Security 安全模块，使用了 UserManageModule 模块，在实现单点登录 SSO 时，将该模块导入进相应的微服务即可
 - SystemService8001：通用权限管理微服务模块，包含各控制器，使用了 SecurityModule 模块
 
-## 端口号：
+## 端口号
 - 后端：8001
 - 前端：8080（Nginx代理）
