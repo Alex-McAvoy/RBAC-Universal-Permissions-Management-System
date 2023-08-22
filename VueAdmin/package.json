@@ -1,7 +1,7 @@
 {
   "name": "vue-admin",
   "version": "1.0.0",
-  "description": "RBAC 通用权限管理系统前端",
+  "description": "RBAC 通用权限管理系统前端，基于 vue-element-admin",
   "author": "Alex_McAvoy <931772462@qq.com>",
   "scripts": {
     "dev": "vue-cli-service serve",
